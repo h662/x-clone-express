@@ -192,4 +192,63 @@ router.get("/:userId", async (req, res) => {
   }
 });
 
+router.put("/:id", verifyToken, async (req: any, res) => {
+  try {
+    const { id } = req.params;
+    const { content } = req.body;
+    const { account } = req;
+
+    if (!id || !content) {
+      return res.status(400).json({
+        ok: false,
+        message: "Not exist data.",
+      });
+    }
+
+    const user = await client.user.findUnique({
+      where: {
+        account,
+      },
+    });
+
+    if (!user) {
+      return res.status(400).json({
+        ok: false,
+        message: "Not exist user.",
+      });
+    }
+
+    const existPost = await client.post.findUnique({
+      where: {
+        id: +id,
+      },
+    });
+
+    if (!existPost || existPost.userId !== user.id) {
+      return res.status(400).json({
+        ok: false,
+        message: "Can not access.",
+      });
+    }
+
+    const newPost = await client.post.update({
+      where: {
+        id: +id,
+      },
+      data: {
+        content,
+      },
+    });
+
+    return res.json({ ok: true, post: newPost });
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      ok: false,
+      message: "Server error.",
+    });
+  }
+});
+
 export default router;
