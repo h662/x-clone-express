@@ -63,6 +63,19 @@ router.get("/", async (req, res) => {
     const posts = await client.post.findMany({
       skip: +page! * 3,
       take: 3,
+      select: {
+        id: true,
+        content: true,
+        userId: true,
+        user: {
+          select: {
+            account: true,
+          },
+        },
+      },
+      orderBy: {
+        id: "desc",
+      },
     });
 
     if (posts.length === 0) {
