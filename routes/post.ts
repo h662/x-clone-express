@@ -34,7 +34,7 @@ router.post("/", verifyToken, async (req: any, res) => {
     const post = await client.post.create({
       data: {
         content,
-        userId: user?.id,
+        userId: user.id,
       },
     });
 
@@ -241,6 +241,61 @@ router.put("/:id", verifyToken, async (req: any, res) => {
     });
 
     return res.json({ ok: true, post: newPost });
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      ok: false,
+      message: "Server error.",
+    });
+  }
+});
+
+router.delete("/:id", verifyToken, async (req: any, res) => {
+  try {
+    const { id } = req.params;
+    const { account } = req;
+
+    if (!id) {
+      return res.status(400).json({
+        ok: false,
+        message: "Not exist data.",
+      });
+    }
+
+    const user = await client.user.findUnique({
+      where: {
+        account,
+      },
+    });
+
+    if (!user) {
+      return res.status(400).json({
+        ok: false,
+        message: "Not exist user.",
+      });
+    }
+
+    const existPost = await client.post.findUnique({
+      where: {
+        id: +id,
+      },
+    });
+
+    if (!existPost || existPost.userId !== user.id) {
+      return res.status(400).json({
+        ok: false,
+        message: "Can not access.",
+      });
+    }
+
+    const deletedPost = await client.post.delete({
+      where: {
+        id: +id,
+      },
+    });
+
+    return res.json({ ok: true, post: deletedPost });
   } catch (error) {
     console.error(error);
 
