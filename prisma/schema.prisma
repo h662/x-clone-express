@@ -28,6 +28,7 @@ model Post {
   userId    Int
   user      User      @relation(fields: [userId], references: [id])
   comments  Comment[]
+  Like      Like[]
 }
 
 model Comment {
@@ -39,4 +40,16 @@ model Comment {
   user      User     @relation(fields: [userId], references: [id])
   postId    Int
   post      Post     @relation(fields: [postId], references: [id])
+  Like      Like[]
+}
+
+model Like {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isLiked   Boolean  @default(false)
+  postId    Int?
+  post      Post?    @relation(fields: [postId], references: [id])
+  commentId Int?
+  comment   Comment? @relation(fields: [commentId], references: [id])
 }

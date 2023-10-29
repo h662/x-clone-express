@@ -4,6 +4,7 @@ import userRouter from "./routes/user";
 import authRouter from "./routes/auth";
 import postRouter from "./routes/post";
 import commentRouter from "./routes/comment";
+import likeRouter from "./routes/like";
 
 const app = express();
 const port = 3010;
@@ -15,6 +16,7 @@ app.use("/user", userRouter);
 app.use("/auth", authRouter);
 app.use("/post", postRouter);
 app.use("/comment", commentRouter);
+app.use("/like", likeRouter);
 
 app.get("/", (req, res) => {
   return res.send("Hello, Express!");
