@@ -213,6 +213,59 @@ router.put("/:id", verifyToken, async (req: any, res) => {
   }
 });
 
-// 댓글 삭제
+router.delete("/:id", verifyToken, async (req: any, res) => {
+  try {
+    const { id } = req.params;
+    const { account } = req;
+
+    if (!id) {
+      return res.status(400).json({
+        ok: false,
+        message: "Not exist data.",
+      });
+    }
+
+    const user = await client.user.findUnique({
+      where: {
+        account,
+      },
+    });
+
+    if (!user) {
+      return res.status(400).json({
+        ok: false,
+        message: "Not exist user.",
+      });
+    }
+
+    const existComment = await client.comment.findUnique({
+      where: {
+        id: +id,
+      },
+    });
+
+    if (!existComment || existComment.userId !== user.id) {
+      return res.status(400).json({
+        ok: false,
+        message: "Can not access.",
+      });
+    }
+
+    const deletedComment = await client.comment.delete({
+      where: {
+        id: +id,
+      },
+    });
+
+    return res.json({ ok: true, comment: deletedComment });
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      ok: false,
+      message: "Server error.",
+    });
+  }
+});
 
 export default router;
