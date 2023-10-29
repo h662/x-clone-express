@@ -154,7 +154,64 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-// 댓글 수정
+router.put("/:id", verifyToken, async (req: any, res) => {
+  try {
+    const { id } = req.params;
+    const { content } = req.body;
+    const { account } = req;
+
+    if (!id || !content) {
+      return res.status(400).json({
+        ok: false,
+        message: "Not exist data.",
+      });
+    }
+
+    const user = await client.user.findUnique({
+      where: {
+        account,
+      },
+    });
+
+    if (!user) {
+      return res.status(400).json({
+        ok: false,
+        message: "Not exist user.",
+      });
+    }
+
+    const existComment = await client.comment.findUnique({
+      where: {
+        id: +id,
+      },
+    });
+
+    if (!existComment || existComment.userId !== user.id) {
+      return res.status(400).json({
+        ok: false,
+        message: "Can not access.",
+      });
+    }
+
+    const newComment = await client.comment.update({
+      where: {
+        id: +id,
+      },
+      data: {
+        content,
+      },
+    });
+
+    return res.json({ ok: true, comment: newComment });
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      ok: false,
+      message: "Server error.",
+    });
+  }
+});
 
 // 댓글 삭제
 
