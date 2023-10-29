@@ -55,8 +55,8 @@ router.post("/", async (req, res) => {
   }
 });
 
-export const verifyToken = async (
-  req: any,
+export const verifyToken = (
+  req: Request,
   res: Response,
   next: NextFunction
 ) => {
@@ -70,10 +70,10 @@ export const verifyToken = async (
       });
     }
 
-    const { account } = (await jwt.verify(
+    const { account } = jwt.verify(
       token,
       process.env.JWT_SECRET_KEY!
-    )) as JwtPayload;
+    ) as JwtPayload;
 
     req.account = account;
 

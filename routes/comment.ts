@@ -6,7 +6,7 @@ const router = express.Router();
 
 const client = new PrismaClient();
 
-router.post("/", verifyToken, async (req: any, res) => {
+router.post("/", verifyToken, async (req, res) => {
   try {
     const { content, postId } = req.body;
     const { account } = req;
@@ -154,7 +154,7 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-router.put("/:id", verifyToken, async (req: any, res) => {
+router.put("/:id", verifyToken, async (req, res) => {
   try {
     const { id } = req.params;
     const { content } = req.body;
@@ -213,7 +213,7 @@ router.put("/:id", verifyToken, async (req: any, res) => {
   }
 });
 
-router.delete("/:id", verifyToken, async (req: any, res) => {
+router.delete("/:id", verifyToken, async (req, res) => {
   try {
     const { id } = req.params;
     const { account } = req;
