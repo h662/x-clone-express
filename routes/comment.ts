@@ -63,7 +63,96 @@ router.post("/", verifyToken, async (req: any, res) => {
   }
 });
 
-// 댓글 읽기
+router.get("/", async (req, res) => {
+  try {
+    const { postId } = req.query;
+
+    if (!postId) {
+      return res.status(400).json({
+        ok: false,
+        message: "Not exist post id.",
+      });
+    }
+
+    const comments = await client.comment.findMany({
+      where: {
+        postId: +postId,
+      },
+      select: {
+        id: true,
+        content: true,
+        userId: true,
+        user: {
+          select: {
+            account: true,
+          },
+        },
+      },
+      orderBy: {
+        id: "desc",
+      },
+    });
+
+    return res.json({ ok: true, postId: +postId, comments });
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      ok: false,
+      message: "Server error.",
+    });
+  }
+});
+
+router.get("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).json({
+        ok: false,
+        message: "Not exist id.",
+      });
+    }
+
+    const comment = await client.comment.findUnique({
+      where: {
+        id: +id,
+      },
+      select: {
+        id: true,
+        content: true,
+        userId: true,
+        user: {
+          select: {
+            account: true,
+          },
+        },
+        postId: true,
+        post: {
+          select: {
+            content: true,
+            userId: true,
+            user: {
+              select: {
+                account: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    return res.json({ ok: true, comment });
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      ok: false,
+      message: "Server error.",
+    });
+  }
+});
 
 // 댓글 수정
 
